@@ -66,6 +66,11 @@ const login = async (req, res) => {
 const signup = async (req, res) => {
     const { name, email, role, password } = req.body;
 
+    // Validamos que se envíen todos los campos
+    if (!username || !password || !role) {
+        return res.status(400).json({ message: 'Todos los campos son obligatorios' });
+    }
+
     try {
         //Verificar si el usuario ya existe
         const existingUser = await findUserByEmail(email);
