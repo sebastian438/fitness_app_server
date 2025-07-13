@@ -1,6 +1,10 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
 
+const { validateInput } = require('../middlewares/validateInputs.js');
+const { validateRole } = require('../middlewares/validateRole.js');
+const { validateJWT } = require('../middlewares/validateJwt.js');
+
 const router = new Router();
 
 const {
@@ -11,15 +15,52 @@ const {
     deleteClaseById
 } = require("../controllers/clases.controller.js");
 
+const capacidad_max = 50, capacidad_min = 10;
 
-router.get("/allclases", getAllClass);
+// http://localhost:3000/api/v1/clases/allclases
+router.get("/allclases", [
+    // validateJWT,
+    // validateRole(2)
+], getAllClass);
 
-router.get("/class/search/:title", getClassByTitle);
+// http://localhost:3000/api/v1/clases/search/:title
+router.get("/search/:title", getClassByTitle);
 
-router.post("/createclass", createClase);
+router.post("/createclass", [
+    // validateJWT,
+    // validateRole(2),
+    check("title", "Invalid title")
+        .notEmpty().withMessage("El título no puede estar vacío")
+        .isLength({ min: 3, max: 20 }).withMessage("El título debe tener más de dos caracteres"),
+    check("descripcion", "Invalid description")
+        .notEmpty().withMessage("La descripción no puede estar vacía")
+        .isLength({ min: 10, max: 100 }).withMessage("La descripción debe tener entre diez y cien caracteres"),
+    check("capacity", "Invalid capacity")
+        .notEmpty().withMessage("La capacidad no puede estar vacía")
+        .isInt({ min: capacidad_min, max: capacidad_max })
+        .withMessage(`La capacidad debe estar entre ${capacidad_min} y ${capacidad_max}`),
+    validateInput
+], createClase);
 
-router.put("/updateclass", updateClaseById);
+router.put("/updateclass/:id", [
+    // validateJWT,
+    // validateRole(2),
+    check("title", "Invalid title")
+        .notEmpty().withMessage("El título no puede estar vacío")
+        .isLength({ min: 3, max: 20 }).withMessage("El título debe tener más de dos caracteres"),
+    check("descripcion", "Invalid description")
+        .notEmpty().withMessage("La descripción no puede estar vacía")
+        .isLength({ min: 10, max: 100 }).withMessage("La descripción debe tener entre diez y cien caracteres"),
+    check("capacity", "Invalid capacity")
+        .notEmpty().withMessage("La capacidad no puede estar vacía")
+        .isInt({ min: capacidad_min, max: capacidad_max })
+        .withMessage(`La capacidad debe estar entre ${capacidad_min} y ${capacidad_max}`),
+    validateInput
+], updateClaseById);
 
-router.delete("/deleteclas/:class_id", deleteClaseById);
+router.delete("/deleteclas/:id", [
+    // validateJWT,
+    // validateRole(2),
+], deleteClaseById);
 
 module.exports = router;

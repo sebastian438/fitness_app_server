@@ -101,30 +101,36 @@ const createClase = async (req, res) => {
 
 
 const updateClaseById = async (req, res) => {
+    const { id } = req.params
+    console.log("paramas:", id);
     try {
         const { //Extrae del body los datos que pueden actualizarse
-            title, descripcion,
-            capacity, class_id
-        } = req.body;
-
-        const updatedClass = await updateClassById({// Llama a la función que actualiza la clase en la BBDD pasando todos los datos
-            class_id: Number(class_id), // Convierte a número para evitar errores de tipo
             title,
             descripcion,
             capacity
+        } = req.body;
+
+        console.log(title, descripcion, capacity, id);
+
+        const updatedClass = await updateClassById({// Llama a la función que actualiza la clase en la BBDD pasando todos los datos
+            class_id: Number(id), // Convierte a número para evitar errores de tipo
+            title,
+            descripcion,
+            capacity,
         });
 
         if (!updatedClass) { // Si no se ha actualiza ninguna clase:
             return res.status(404).json({
                 ok: false,
                 token: req.renewedToken,
-                error: "Clase no encontrada o no actualizada",
+                error: "Error al actualizar la clase",
             });
         }
 
         res.status(200).json({
             ok: true,
-            data: updateClass
+            message: "Clase actualizada correctamente",
+            data: updatedClass
         });
 
     } catch (error) {
@@ -138,11 +144,11 @@ const updateClaseById = async (req, res) => {
 
 
 const deleteClaseById = async (req, res) => {
-    const { class_id } = req.params; //Extrae el parámetro de la URL (req.params)
+    const { id } = req.params; //Extrae el parámetro de la URL (req.params)
 
     try {
         // Llama a la función del modelo que elimina la clase por su ID
-        const deleted = await deleteClassById(Number(class_id)); //Convierte a número para evitar errores de tipo
+        const deleted = await deleteClassById(Number(id)); //Convierte a número para evitar errores de tipo
 
         if (!deleted) { //Si no se elimina ninguna clase
             return res.status(404).json({

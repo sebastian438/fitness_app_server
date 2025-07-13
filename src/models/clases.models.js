@@ -29,12 +29,16 @@ const insertNewClass = async (classData) => {
 
 // FUNCION: Actualizar clase por id
 const updateClassById = async ({
-    class_id, title,
-    descripcion, capacity
+    class_id, 
+    title,
+    descripcion, 
+    capacity
 }) => {
     const result = await queryDB(updateById, [
-        title, descripcion,
-        capacity, class_id// al final porque es WHERE film_id = $8
+        title, 
+        descripcion,
+        capacity, 
+        class_id// al final porque es WHERE class_id = $4
     ]);
     return result.rows[0] || null;
 };

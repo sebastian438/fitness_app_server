@@ -21,11 +21,11 @@ const clasesQueries = {
 
     //Consulta para editar una clase
     updateById: `
-        UPDATE films
+        UPDATE clases
         SET 
             title = $1,
             descripcion = $2,
-            capacity = $3,
+            capacity = $3
         WHERE class_id = $4
         RETURNING *;`,
 

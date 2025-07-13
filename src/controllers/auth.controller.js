@@ -13,61 +13,106 @@ const { generatedJwt } = require("../utils/generate.jwt.js");
 // const passwd = "1234"
 
 
+// const login = async (req, res) => {
+//     const { email, password } = req.body;
+
+//     //Llamada a la bese de datos
+//     try {
+//         //1.Buscar el usuario por email
+//         const user = await findUserByEmail(email);
+
+//         //2. Si no existe el usuario
+//         if (!user) {
+//             return res.status(401).json({
+//                 error: "Contraseña o usuario incorrecto"
+//             });
+//         }
+
+//         //3. Si sí existe comparar contraseña con bcrypt
+//         const isMatch = await bcrypt.compare(password, user.password_hash);
+//         if (!isMatch) {
+//             return res.status(401).json({
+//                 error: "Contraseña o usuario incorrecto"
+//             });
+//         }
+
+//         //4. Generar token si todo coincide jwt
+//         const token = await generatedJwt({
+//             uid: user.user_id,
+//             email: user.email,
+//             role: user.role_id
+//         });
+
+//         //5. Respuesta exitosa
+//         return res.status(200).json({
+//             message: "Login correcto",
+//             token,
+//             user: {
+//                 id: user.user_id,
+//                 role: user.role_id,
+//                 name: user.name,
+//                 email: user.email
+//             }
+//         })
+
+//     } catch (error) {
+//         console.log("Error en login:", error);
+//         return res.status(500).json({
+//             error: "Errores interno del servidor"
+//         });
+//     }
+// };
+
 const login = async (req, res) => {
     const { email, password } = req.body;
 
-    //Llamada a la bese de datos
     try {
-        //1.Buscar el usuario por email
         const user = await findUserByEmail(email);
-
-        //2. Si no existe el usuario
         if (!user) {
-            return res.status(401).json({
-                error: "Contraseña o usuario incorrecto"
-            });
+            return res.status(401).json({ error: "Contraseña o usuario incorrecto" });
         }
 
-        //3. Si sí existe comparar contraseña con bcrypt
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) {
-            return res.status(401).json({
-                error: "Contraseña o usuario incorrecto"
-            });
+            return res.status(401).json({ error: "Contraseña o usuario incorrecto" });
         }
 
-        //4. Generar token si todo coincide jwt
         const token = await generatedJwt({
             uid: user.user_id,
             email: user.email,
-            role: user.role_id
+            role: user.role_id,
         });
 
-        //5. Respuesta exitosa
-        return res.status(200).json({
-            message: "Login correcto",
-            token,
-            user: {
-                id: user.user_id,
-                role: user.role_id,
-                name: user.name,
-                email: user.email
-            }
-        })
-
+        res
+            .cookie("token", token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production", 
+                maxAge: 1000 * 60 * 60 * 6,                  
+                sameSite: "lax",
+                path: "/",                                   
+            })
+            .status(200)
+            .json({
+                message: "Login correcto",
+                user: {
+                    id: user.user_id,
+                    role: user.role_id,
+                    name: user.name,
+                    email: user.email,
+                },
+            });
     } catch (error) {
-        console.log("Error en login:", error);
-        return res.status(500).json({
-            error: "Errores interno del servidor"
-        });
+        console.error("Error en login:", error);
+        return res.status(500).json({ error: "Error interno del servidor" });
     }
 };
+
 
 const signup = async (req, res) => {
     const { name, email, role, password } = req.body;
 
     // Validamos que se envíen todos los campos
-    if (!username || !password || !role) {
+    if (!name || !password || !role) {
         return res.status(400).json({ message: 'Todos los campos son obligatorios' });
     }
 
