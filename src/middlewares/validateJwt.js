@@ -13,15 +13,13 @@ const verifyJWT = async (token) => {
 };
 
 const validateJWT = async (req, res, next) => {
-
-    const authorization = req.header('authorization');
-    if (!authorization) {
-        return res.status(404).json({
+    const token = req.cookies.token;
+    if (!token) {
+        return res.status(401).json({
             ok: false,
-            msg: "no contiene autorización"
+            msg: "No se ha proporcionado token de autorización"
         });
     }
-    const token = authorization.split(" ")[1];
     try {
         const playLoad = await verifyJWT(token);
         const renewedToken = await generatedJwt({

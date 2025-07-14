@@ -8,6 +8,10 @@ const {
 } = require('../models/users.models.js');
 const { generatedJwt } = require("../utils/generate.jwt.js");
 
+//Login: valida usuario/contraseña, genera JWT y lo guarda en cookie.
+
+//Signup: hashea la contraseña y guarda el usuario, devolviendo un JSON.
+
 // Pruebas
 // const usuario = "user"
 // const passwd = "1234"
@@ -64,32 +68,50 @@ const { generatedJwt } = require("../utils/generate.jwt.js");
 // };
 
 const login = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password } = req.body; // Extrae credenciales
 
     try {
+        // Busca usuario en BD por email
         const user = await findUserByEmail(email);
         if (!user) {
             return res.status(401).json({ error: "Contraseña o usuario incorrecto" });
         }
 
+        // Compara contraseña con hash almacenado
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) {
             return res.status(401).json({ error: "Contraseña o usuario incorrecto" });
         }
 
+        // Genera JWT con payload { uid, email, role }
         const token = await generatedJwt({
             uid: user.user_id,
             email: user.email,
             role: user.role_id,
         });
 
+        // Envía cookie httpOnly + respuesta JSON con datos de usuario
         res
             .cookie("token", token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production", 
-                maxAge: 1000 * 60 * 60 * 6,                  
+                secure: process.env.NODE_ENV === "production",
+                maxAge: 1000 * 60 * 60 * 6,
                 sameSite: "lax",
-                path: "/",                                   
+                path: "/",
+            })
+            .cookie("user_id", user.user_id, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                maxAge: 1000 * 60 * 60 * 6,
+                sameSite: "lax",
+                path: "/",
+            })
+            .cookie("role", user.role_id, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                maxAge: 1000 * 60 * 60 * 6,
+                sameSite: "lax",
+                path: "/",
             })
             .status(200)
             .json({
@@ -109,7 +131,7 @@ const login = async (req, res) => {
 
 
 const signup = async (req, res) => {
-    const { name, email, role, password } = req.body;
+    const { name, email, role, password } = req.body;  // Extrae datos del formulario
 
     // Validamos que se envíen todos los campos
     if (!name || !password || !role) {
@@ -155,5 +177,32 @@ const signup = async (req, res) => {
 
 };
 
+const logout = (req, res) => {
+    // Elimina la cookie "token" en el cliente
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/'
+    });
 
-module.exports = { login, signup };
+    res.clearCookie('user_id', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/'
+    });
+
+    res.clearCookie('role', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/'
+    });
+
+    // Devuelve confirmación al cliente
+    res.json({ ok: true, message: 'Logout exitoso' });
+};
+
+
+module.exports = { login, signup, logout };

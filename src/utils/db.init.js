@@ -74,7 +74,11 @@ const initDB = async () => {
             INSERT INTO clases (title, descripcion, capacity)
             VALUES
                 ('Yoga', 'Bueno para el movimiento', 20),
-                ('Hit', 'Bueno para el corazon', 30);
+                ('Hit', 'Bueno para el corazon', 30),
+                ('Boxeo', 'Bueno para los reflejos', 20),
+                ('Dance', 'Bueno para la alegría', 30),
+                ('Spinning', 'Bueno para el movimiento', 20),
+                ('Core', 'Bueno para el corazon', 30);
             
                 
             INSERT INTO sesiones (session_date, class_id, profesor_id)

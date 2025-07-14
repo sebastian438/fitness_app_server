@@ -9,8 +9,10 @@ const {
 
 const getAllClass = async (req, res) => {
     try {
+        // Trae todas las clases de la DB
         const clases = await getAll(); //Llamada al modelo para obtener todas las clases
 
+        // Devuelve JSON con ok:true y datos
         res.status(200).json({ //200 OK: solicitud exitosa, respuesta satisfactoria
             ok: true,
             token: req.renewedToken,

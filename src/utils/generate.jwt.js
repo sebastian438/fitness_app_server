@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 
+//generatedJwt crea un token firmado con la clave secreta.
 const generatedJwt = async ({ uid, email, role }) => {
     try {
         const privateKey = process.env.JWT_SECRET;

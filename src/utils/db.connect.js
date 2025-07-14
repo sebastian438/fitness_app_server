@@ -1,3 +1,4 @@
+//Pool gestiona las conexiones a PostgreSQL.
 const { Pool } = require('pg');
 require('dotenv').config();
 

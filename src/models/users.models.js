@@ -1,3 +1,4 @@
+// queryDB es un helper que gestiona la conexión y la ejecución de SQL con pg
 const { queryDB } = require("../utils/db.query.js");
 const {
     findByEmail,
@@ -41,7 +42,7 @@ const findUserById = async (id) => {
  * @param {*} password contraseña del nuevo usuario
  * @returns usuario nuevo
  */
-const saveNewUser = async ({name, email, role, password}) => {
+const saveNewUser = async ({ name, email, role, password }) => {
     const result = await queryDB(insertUser, [name, email, role, password]);
     return result.rows[0];
 }

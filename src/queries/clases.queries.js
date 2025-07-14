@@ -9,7 +9,8 @@ const clasesQueries = {
     //Consulta para obtener todas las clases. 
     getAllClases:
         `SELECT * 
-        FROM clases`,
+        FROM clases
+        ORDER by title`,
 
     //Consulta para insertar una clase en la bbdd. Devuelve la clase insertada. 
     insertClass:

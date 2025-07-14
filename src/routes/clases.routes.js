@@ -18,17 +18,21 @@ const {
 const capacidad_max = 50, capacidad_min = 10;
 
 // http://localhost:3000/api/v1/clases/allclases
+// GET /allclases  lista todas las clases (JWT + rol Admin)
 router.get("/allclases", [
-    // validateJWT,
-    // validateRole(2)
+    validateJWT,
+    validateRole(2)
 ], getAllClass);
 
 // http://localhost:3000/api/v1/clases/search/:title
+// GET /search/:title  busca clases por título (público)
 router.get("/search/:title", getClassByTitle);
 
+// POST /createclass crea una clase (Admin)
 router.post("/createclass", [
-    // validateJWT,
-    // validateRole(2),
+    validateJWT,
+    validateRole(2),
+    // Validaciones de campos con express-validator
     check("title", "Invalid title")
         .notEmpty().withMessage("El título no puede estar vacío")
         .isLength({ min: 3, max: 20 }).withMessage("El título debe tener más de dos caracteres"),
@@ -42,9 +46,10 @@ router.post("/createclass", [
     validateInput
 ], createClase);
 
+// PUT /updateclass/:id  actualiza clase por id (Admin)
 router.put("/updateclass/:id", [
-    // validateJWT,
-    // validateRole(2),
+    validateJWT,
+    validateRole(2),
     check("title", "Invalid title")
         .notEmpty().withMessage("El título no puede estar vacío")
         .isLength({ min: 3, max: 20 }).withMessage("El título debe tener más de dos caracteres"),
@@ -58,6 +63,7 @@ router.put("/updateclass/:id", [
     validateInput
 ], updateClaseById);
 
+// DELETE /deleteclas/:id  elimina clase por id (Admin)
 router.delete("/deleteclas/:id", [
     // validateJWT,
     // validateRole(2),
